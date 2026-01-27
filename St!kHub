@@ -336,4 +336,4 @@ AddButton(Settings.Scroll, 100, "Toggle Feature", function() print("Feature togg
 Section(Others.Scroll, 0, "Miscellaneous", "Extra features can go here")
 AddButton(Others.Scroll, 100, "Do Something", function() print("Other button clicked!") end)
 
-print("✅ Infinity Hub fully loaded with scrollable tabs, info, scripts, and console outputs!")
+print("✅ Infinity Hub fully loaded (1.7.5)!")
