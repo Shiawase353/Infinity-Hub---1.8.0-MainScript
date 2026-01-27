@@ -1,0 +1,339 @@
+-- INFINITY HUB - 1.7.5 --
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local Player = Players.LocalPlayer
+
+-------------------------------------------------
+-- CLEAN OLD GUI
+-------------------------------------------------
+pcall(function()
+    Player.PlayerGui:FindFirstChild("Infinity Hub"):Destroy()
+end)
+
+-------------------------------------------------
+-- SCREEN GUI
+-------------------------------------------------
+local Gui = Instance.new("ScreenGui")
+Gui.Name = "Infinity Hub"
+Gui.ResetOnSpawn = false
+Gui.Parent = Player:WaitForChild("PlayerGui")
+
+-------------------------------------------------
+-- STATE
+-------------------------------------------------
+local Hidden = true
+local startTime = tick()
+local executionCount = 0
+
+-------------------------------------------------
+-- MAIN WINDOW
+-------------------------------------------------
+local Main = Instance.new("Frame")
+Main.Size = UDim2.new(0, 620, 0, 360)
+Main.Position = UDim2.new(0.5, -310, 0.5, -180)
+Main.BackgroundColor3 = Color3.fromRGB(16, 16, 20)
+Main.BorderSizePixel = 0
+Main.Active = true
+Main.Draggable = true
+Main.Parent = Gui
+Main.Visible = false
+Instance.new("UICorner", Main).CornerRadius = UDim.new(0, 10)
+
+-------------------------------------------------
+-- TOP BAR
+-------------------------------------------------
+local Top = Instance.new("Frame")
+Top.Size = UDim2.new(1, 0, 0, 42)
+Top.BackgroundColor3 = Color3.fromRGB(20, 20, 26)
+Top.BorderSizePixel = 0
+Top.Parent = Main
+
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, -80, 1, 0)
+Title.Position = UDim2.new(0, 10, 0, 0)
+Title.BackgroundTransparency = 1
+Title.Text = "Welcome, To Infinity Hub!"
+Title.Font = Enum.Font.GothamBold
+Title.TextSize = 14
+Title.TextXAlignment = Enum.TextXAlignment.Left
+Title.TextColor3 = Color3.fromRGB(185, 145, 255)
+Title.Parent = Top
+
+-------------------------------------------------
+-- SHOW HUB BUTTON
+-------------------------------------------------
+local ShowButton = Instance.new("TextButton")
+ShowButton.Size = UDim2.new(0, 150, 0, 35)
+ShowButton.Position = UDim2.new(0.5, -75, 0, 10)
+ShowButton.AnchorPoint = Vector2.new(0.5, 0)
+ShowButton.BackgroundColor3 = Color3.fromRGB(26, 26, 34)
+ShowButton.TextColor3 = Color3.fromRGB(190, 150, 255)
+ShowButton.Font = Enum.Font.GothamBold
+ShowButton.TextSize = 14
+ShowButton.Text = "IH"
+ShowButton.Parent = Gui
+ShowButton.Visible = true
+Instance.new("UICorner", ShowButton).CornerRadius = UDim.new(0, 6)
+
+local glowShow = Instance.new("UIStroke", ShowButton)
+glowShow.Color = Color3.fromRGB(170, 120, 255)
+glowShow.Transparency = 0.7
+
+ShowButton.MouseEnter:Connect(function() glowShow.Transparency = 0 end)
+ShowButton.MouseLeave:Connect(function() glowShow.Transparency = 0.7 end)
+ShowButton.MouseButton1Click:Connect(function()
+    Main.Visible = true
+    Hidden = false
+    ShowButton.Visible = false
+end)
+
+-------------------------------------------------
+-- FUNCTION TO CREATE TOP BUTTON
+-------------------------------------------------
+local function CreateTopButton(parent, text, offsetX, callback)
+    local b = Instance.new("TextButton")
+    b.Size = UDim2.new(0, 30, 0, 30)
+    b.Position = UDim2.new(1, -offsetX - 10, 0, 6)
+    b.Text = text
+    b.Font = Enum.Font.GothamBold
+    b.TextSize = 18
+    b.TextColor3 = Color3.fromRGB(220, 150, 255)
+    b.BackgroundColor3 = Color3.fromRGB(26, 26, 34)
+    b.BorderSizePixel = 0
+    b.Parent = parent
+    Instance.new("UICorner", b).CornerRadius = UDim.new(0, 6)
+
+    local glow = Instance.new("UIStroke", b)
+    glow.Color = Color3.fromRGB(170, 120, 255)
+    glow.Transparency = 0.7
+
+    b.MouseEnter:Connect(function() glow.Transparency = 0 end)
+    b.MouseLeave:Connect(function() glow.Transparency = 0.7 end)
+    b.MouseButton1Click:Connect(callback)
+end
+
+-------------------------------------------------
+-- CLOSE AND HIDE BUTTON
+-------------------------------------------------
+CreateTopButton(Top, "X", 10, function() Gui:Destroy() end)
+CreateTopButton(Top, "–", 50, function()
+    Main.Visible = false
+    Hidden = true
+    ShowButton.Visible = true
+end)
+
+-------------------------------------------------
+-- SIDEBAR
+-------------------------------------------------
+local Side = Instance.new("Frame")
+Side.Position = UDim2.new(0, 0, 0, 42)
+Side.Size = UDim2.new(0, 70, 1, -42)
+Side.BackgroundColor3 = Color3.fromRGB(18, 18, 22)
+Side.BorderSizePixel = 0
+Side.Parent = Main
+
+-------------------------------------------------
+-- PAGES
+-------------------------------------------------
+local Pages = {}
+local CurrentPage
+
+local function NewPage(name)
+    local p = Instance.new("Frame")
+    p.Name = name
+    p.Size = UDim2.new(1, 0, 1, 0)
+    p.Position = UDim2.new(0, 0, 0, 0)
+    p.BackgroundTransparency = 1
+    p.Visible = false
+    p.Parent = Main
+
+-------------------------------------------------
+-- SCROLLABLE FRAMES INSIDE TAB
+-------------------------------------------------
+    local scroll = Instance.new("ScrollingFrame")
+    scroll.Size = UDim2.new(1, -90, 1, -70)
+    scroll.Position = UDim2.new(0, 90, 0, 60)
+    scroll.BackgroundTransparency = 1
+    scroll.ScrollBarThickness = 6
+    scroll.CanvasSize = UDim2.new(0, 0, 0, 0)
+    scroll.VerticalScrollBarInset = Enum.ScrollBarInset.ScrollBar
+    scroll.Parent = p
+    scroll.Name = name .. "_Scroll"
+
+    Pages[name] = {Page = p, Scroll = scroll}
+    return Pages[name]
+end
+
+local Info = NewPage("Info")
+local Scripts = NewPage("Scripts")
+local Settings = NewPage("Settings")
+local Others = NewPage("Others")
+Info.Page.Visible = true
+CurrentPage = Info
+
+-------------------------------------------------
+-- ICON TAB CREATOR
+-------------------------------------------------
+local function IconTab(icon, pageTable, y)
+    local b = Instance.new("TextButton")
+    b.Size = UDim2.new(0, 46, 0, 40)
+    b.Position = UDim2.new(0, 12, 0, y)
+    b.Text = icon
+    b.Font = Enum.Font.GothamBold
+    b.TextSize = 18
+    b.TextColor3 = Color3.fromRGB(190, 150, 255)
+    b.BackgroundColor3 = Color3.fromRGB(26, 26, 34)
+    b.BorderSizePixel = 0
+    b.Parent = Side
+    Instance.new("UICorner", b).CornerRadius = UDim.new(0, 8)
+
+    local glow = Instance.new("UIStroke", b)
+    glow.Color = Color3.fromRGB(170, 120, 255)
+    glow.Transparency = 1
+
+    b.MouseEnter:Connect(function()
+        TweenService:Create(glow, TweenInfo.new(0.2), {Transparency = 0}):Play()
+    end)
+    b.MouseLeave:Connect(function()
+        TweenService:Create(glow, TweenInfo.new(0.2), {Transparency = 1}):Play()
+    end)
+
+    b.MouseButton1Click:Connect(function()
+        if CurrentPage then
+            CurrentPage.Page.Visible = false
+        end
+        pageTable.Page.Visible = true
+        CurrentPage = pageTable
+    end)
+end
+
+-------------------------------------------------
+-- TABS
+-------------------------------------------------
+IconTab("ℹ", Info, 20)
+IconTab("📜", Scripts, 70)
+IconTab("⚙", Settings, 120)
+IconTab("⭐", Others, 170)
+
+-------------------------------------------------
+-- SETTING FUNCTION
+-------------------------------------------------
+local function Section(scrollParent, y, title, text)
+    local f = Instance.new("Frame")
+    f.Size = UDim2.new(1, 0, 0, 90)
+    f.Position = UDim2.new(0, 0, 0, y)
+    f.BackgroundColor3 = Color3.fromRGB(22, 22, 28)
+    f.BorderSizePixel = 0
+    Instance.new("UICorner", f).CornerRadius = UDim.new(0, 8)
+    f.Parent = scrollParent
+
+    local t = Instance.new("TextLabel", f)
+    t.Size = UDim2.new(1, -20, 0, 24)
+    t.Position = UDim2.new(0, 10, 0, 6)
+    t.BackgroundTransparency = 1
+    t.Text = title
+    t.Font = Enum.Font.GothamBold
+    t.TextSize = 13
+    t.TextXAlignment = Enum.TextXAlignment.Left
+    t.TextColor3 = Color3.fromRGB(195, 155, 255)
+
+    local d = Instance.new("TextLabel", f)
+    d.Size = UDim2.new(1, -20, 0, 50)
+    d.Position = UDim2.new(0, 10, 0, 32)
+    d.BackgroundTransparency = 1
+    d.TextWrapped = true
+    d.TextYAlignment = Enum.TextYAlignment.Top
+    d.TextXAlignment = Enum.TextXAlignment.Left
+    d.Font = Enum.Font.Gotham
+    d.TextSize = 13
+    d.TextColor3 = Color3.fromRGB(225, 225, 225)
+    d.Text = text
+
+    scrollParent.CanvasSize = UDim2.new(0, 0, 0, y + 100)
+    return d
+end
+
+-------------------------------------------------
+-- BUTTON FUNCTION
+-------------------------------------------------
+local function AddButton(scrollParent, y, text, callback)
+    local b = Instance.new("TextButton")
+    b.Size = UDim2.new(0, 200, 0, 40)
+    b.Position = UDim2.new(0, 10, 0, y)
+    b.BackgroundColor3 = Color3.fromRGB(70, 40, 120)
+    b.TextColor3 = Color3.fromRGB(255, 255, 255)
+    b.Font = Enum.Font.GothamBold
+    b.TextSize = 14
+    b.Text = text
+    b.BorderSizePixel = 0
+    Instance.new("UICorner", b).CornerRadius = UDim.new(0, 8)
+    b.Parent = scrollParent
+
+    local glow = Instance.new("UIStroke", b)
+    glow.Color = Color3.fromRGB(190, 120, 255)
+    glow.Transparency = 0.7
+
+    b.MouseEnter:Connect(function() glow.Transparency = 0 end)
+    b.MouseLeave:Connect(function() glow.Transparency = 0.7 end)
+    b.MouseButton1Click:Connect(function()
+        if callback then callback() end
+    end)
+
+    scrollParent.CanvasSize = UDim2.new(0, 0, 0, y + 50)
+end
+
+-------------------------------------------------
+-- INFO TAB
+-------------------------------------------------
+local infoLabel = Section(Info.Scroll, 0, "Information", "")
+Section(Info.Scroll, 100, "Credits", "Developer: Stik\nYou are whitelisted, nice!")
+Section(Info.Scroll, 200, "Version", "v1.7.5")
+AddButton(Info.Scroll, 280, "Thanks for using the Hub ;3", function() print("Thank ya!") end)
+
+spawn(function()
+    while true do
+        task.wait(1)
+        local elapsed = tick() - startTime
+        local hrs = math.floor(elapsed / 3600)
+        local mins = math.floor((elapsed % 3600) / 60)
+        local secs = math.floor(elapsed % 60)
+        infoLabel.Text = string.format("Method: Lua Script\nExecution Count: %d\nElapsed Time: %02d:%02d:%02d", executionCount, hrs, mins, secs)
+    end
+end)
+
+-------------------------------------------------
+-- SCRIPT TAB
+-------------------------------------------------
+Section(Scripts.Scroll, 0, "Available Scripts", "Here you can execute available scripts.")
+local spacing = 10
+local startY = 100
+local buttonHeight = 40
+
+local scriptsList = {
+    {"- Translator -", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/StikFur/translator/refs/heads/main/Translator"))() executionCount = executionCount + 1 print("- Translator executed!") end},
+    {"- Ported IY -", function() loadstring(game:HttpGet("https://pandadevelopment.net/virtual/file/2eabce36586bcc7d"))() executionCount = executionCount + 1 print("- Ported IY executed!") end},
+    {"- VPLI Hub -", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/Adam3mka/The-chosen-one-lukaku/refs/heads/main/Protected_6361979247750901.txt"))() executionCount = executionCount + 1 print("- VPLI Hub executed!") end},
+    {"- Matrix Hub -", function() loadstring(game:HttpGet('https://raw.githubusercontent.com/StikFur/MatrixHUB/refs/heads/main/Stik'))() executionCount = executionCount + 1 print("- Matrix Hub executed!") end},
+    {"- Extra Stuff -", function() loadstring(game:HttpGet("https://pastebin.com/raw/sqadnExa"))() executionCount = executionCount + 1 print("- Extra Stuff executed!") end},
+    {"- XVC Hub -", function() loadstring(game:HttpGet("https://luna.xvchubontop.workers.dev/"))() executionCount = executionCount + 1 print("- XVC Hub executed!") end},
+    {"- Brick UA -", function() loadstring(game:HttpGet("https://pastebin.com/raw/sqadnExa"))() executionCount = executionCount + 1 print("- Brick UA executed!") end},
+    {"- Chat Spammer -", function() loadstring(game:HttpGet('https://raw.githubusercontent.com/k1llm3sixy/chat-spammer/refs/heads/main/chat_spammer.lua'))() executionCount = executionCount + 1 print("- Chat Spammer executed!") end},
+}
+
+for i, v in ipairs(scriptsList) do
+    AddButton(Scripts.Scroll, startY + (i-1)*(buttonHeight + spacing), v[1], v[2])
+end
+
+-------------------------------------------------
+-- SETTINGS TAB
+-------------------------------------------------
+Section(Settings.Scroll, 0, "Controls", "Drag window anywhere\nUse left icons to switch tabs")
+AddButton(Settings.Scroll, 100, "Toggle Feature", function() print("Feature toggled!") end)
+
+-- -------------------------------------------------
+-- OTHERS TAB
+---------------------------------------------------
+Section(Others.Scroll, 0, "Miscellaneous", "Extra features can go here")
+AddButton(Others.Scroll, 100, "Do Something", function() print("Other button clicked!") end)
+
+print("✅ Infinity Hub fully loaded with scrollable tabs, info, scripts, and console outputs!")
