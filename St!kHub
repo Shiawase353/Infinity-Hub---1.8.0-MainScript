@@ -386,9 +386,9 @@ AddButton(Settings.Scroll, 160, "Rejoin Server", function()
 
     -- Queue your hub script before teleport
     if queue_on_teleport then
-        queue_on_teleport([[loadstring(game:HttpGet("https://pastebin.com/raw/yourhubscript"))()]])
+        queue_on_teleport([[loadstring(game:HttpGet("https://raw.githubusercontent.com/StikFur/Infinity-Hub---1.7.6-MainScript/refs/heads/main/St!kHub"))()]])
     elseif syn and syn.queue_on_teleport then
-        syn.queue_on_teleport([[loadstring(game:HttpGet("https://pastebin.com/raw/yourhubscript"))()]])
+        syn.queue_on_teleport([[loadstring(game:HttpGet("https://raw.githubusercontent.com/StikFur/Infinity-Hub---1.7.6-MainScript/refs/heads/main/St!kHub"))()]])
     end
 
     -- Teleport
@@ -404,9 +404,9 @@ AddButton(Settings.Scroll, 220, "Hop Server", function()
 
     -- Queue hub script for next server
     if queue_on_teleport then
-        queue_on_teleport([[loadstring(game:HttpGet("https://raw.githubusercontent.com/StikFur/Infinity---Hub-Version-1.7.6/refs/heads/main/St!kHub"))()]])
+        queue_on_teleport([[loadstring(game:HttpGet("https://raw.githubusercontent.com/StikFur/Infinity-Hub---1.7.6-MainScript/refs/heads/main/St!kHub"))()]])
     elseif syn and syn.queue_on_teleport then
-        syn.queue_on_teleport([[loadstring(game:HttpGet("https://raw.githubusercontent.com/StikFur/Infinity---Hub-Version-1.7.6/refs/heads/main/St!kHub"))()]])
+        syn.queue_on_teleport([[loadstring(game:HttpGet("https://raw.githubusercontent.com/StikFur/Infinity-Hub---1.7.6-MainScript/refs/heads/main/St!kHub"))()]])
     end
 
     -- Fetch available servers
