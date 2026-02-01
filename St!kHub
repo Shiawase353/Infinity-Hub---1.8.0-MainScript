@@ -1,36 +1,20 @@
 -------------------------------------------------
--- Infinity Hub 1.7.7
+-- Infinity Hub 1.8 - INF HUB!
 -------------------------------------------------
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
 local Player = Players.LocalPlayer
 
--- Groups you want to show titles for
-local groups = {
-    [5345749]    = {"Chosen One Enthusiasts Club", Color3.fromRGB(0,255,0)},
-    [35956339]   = {"Clementiuilo", Color3.fromRGB(108,77,59)},
-    [33203248]   = {"Roblox's Rejects", Color3.fromRGB(177,125,82)},
-    [35155850]   = {"Unchainable Mercy", Color3.fromRGB(108,77,59)},
-    [35985581]   = {"Genesis", Color3.fromRGB(82,138,174)},
-    [33258647]   = {"Union of Mirrland Communist States", Color3.fromRGB(120,0,0)},
-    [34915496]   = {"dauens silly", Color3.fromRGB(0,120,0)},
-    [34348476]   = {"Frigid's silly fan club", Color3.fromRGB(0,0,200)},
-    [34838919]   = {"The Eternal Flame of TCO", Color3.fromRGB(255,255,0)},
-    [35986983]   = {"Realm ???", Color3.fromRGB(42,73,199)},
-    [286855251]  = {"| The Mafia |", Color3.fromRGB(139,0,0)}
-}
-
-
 -------------------------------------------------
--- Clean OLD GUI
+-- Clean old GUI
 -------------------------------------------------
 pcall(function()
     Player.PlayerGui:FindFirstChild("Infinity Hub"):Destroy()
 end)
 
 -------------------------------------------------
--- SCREEN GUI
+-- Screen GUI
 -------------------------------------------------
 local Gui = Instance.new("ScreenGui")
 Gui.Name = "Infinity Hub"
@@ -38,11 +22,13 @@ Gui.ResetOnSpawn = false
 Gui.Parent = Player:WaitForChild("PlayerGui")
 
 -------------------------------------------------
--- STATE
+-- State
 -------------------------------------------------
 local Hidden = true
 local startTime = tick()
 local executionCount = 0
+
+_G.ShowGroupTitles = true
 
 -------------------------------------------------
 -- MAIN WINDOW
@@ -79,63 +65,57 @@ Title.TextColor3 = Color3.fromRGB(185, 145, 255)
 Title.Parent = Top
 
 -------------------------------------------------
--- SHOW HUB BUTTON
+-- SHOW BUTTON (DRAGGABLE + MOBILE/PC)
 -------------------------------------------------
 local ShowButton = Instance.new("TextButton")
-ShowButton.Size = UDim2.new(0, 150, 0, 35)
-ShowButton.Position = UDim2.new(0.5, -75, 0, 10)
-ShowButton.AnchorPoint = Vector2.new(0.5, 0)
-ShowButton.BackgroundColor3 = Color3.fromRGB(26, 26, 34)
-ShowButton.TextColor3 = Color3.fromRGB(190, 150, 255)
+ShowButton.Size = UDim2.new(0,160,0,42)
+ShowButton.Position = UDim2.new(0.5,-80,0,10)
+ShowButton.AnchorPoint = Vector2.new(0.5,0)
+ShowButton.BackgroundColor3 = Color3.fromRGB(26,26,34)
+ShowButton.TextColor3 = Color3.fromRGB(190,150,255)
 ShowButton.Font = Enum.Font.GothamBold
-ShowButton.TextSize = 14
-ShowButton.Text = "IH"
+ShowButton.TextSize = 16
+ShowButton.Text = "Infinity Hub"
 ShowButton.Parent = Gui
 ShowButton.Visible = true
-Instance.new("UICorner", ShowButton).CornerRadius = UDim.new(0, 6)
+Instance.new("UICorner", ShowButton).CornerRadius = UDim.new(0,6)
 
 local glowShow = Instance.new("UIStroke", ShowButton)
-glowShow.Color = Color3.fromRGB(170, 120, 255)
+glowShow.Color = Color3.fromRGB(170,120,255)
 glowShow.Transparency = 0.7
 
-ShowButton.MouseEnter:Connect(function() glowShow.Transparency = 0 end)
-ShowButton.MouseLeave:Connect(function() glowShow.Transparency = 0.7 end)
-ShowButton.MouseButton1Click:Connect(function()
+local function ToggleMain()
+    PlayClick(ShowButton)
     Main.Visible = true
     Hidden = false
     ShowButton.Visible = false
-end)
+end
 
--------------------------------------------------
--- DRAG FUNCTION
--------------------------------------------------
-local function MakeDraggable(gui)
-    local dragging, dragInput, dragStart, startPos
+ShowButton.MouseButton1Click:Connect(ToggleMain)
+ShowButton.TouchTap:Connect(ToggleMain)
 
-    gui.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+local function MakeDraggable(button)
+    local dragging = false
+    local dragStart, startPos
+    button.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1
+        or input.UserInputType == Enum.UserInputType.Touch then
             dragging = true
             dragStart = input.Position
-            startPos = gui.Position
-
-            input.Changed:Connect(function()
-                if input.UserInputState == Enum.UserInputState.End then
-                    dragging = false
-                end
-            end)
+            startPos = button.Position
         end
     end)
-
-    gui.InputChanged:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseMovement then
-            dragInput = input
+    button.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1
+        or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = false
         end
     end)
-
     UserInputService.InputChanged:Connect(function(input)
-        if input == dragInput and dragging then
+        if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement
+        or input.UserInputType == Enum.UserInputType.Touch) then
             local delta = input.Position - dragStart
-            gui.Position = UDim2.new(
+            button.Position = UDim2.new(
                 startPos.X.Scale,
                 startPos.X.Offset + delta.X,
                 startPos.Y.Scale,
@@ -145,41 +125,38 @@ local function MakeDraggable(gui)
     end)
 end
 
--------------------------------------------------
--- DRAGGABLE SHOWBUTTON
--------------------------------------------------
 MakeDraggable(ShowButton)
 
 -------------------------------------------------
--- FUNCTION TO CREATE TOP BUTTONS
+-- TOP BUTTONS
 -------------------------------------------------
 local function CreateTopButton(parent, text, offsetX, callback)
     local b = Instance.new("TextButton")
-    b.Size = UDim2.new(0, 30, 0, 30)
-    b.Position = UDim2.new(1, -offsetX - 10, 0, 6)
+    b.Size = UDim2.new(0,30,0,30)
+    b.Position = UDim2.new(1,-offsetX-10,0,6)
     b.Text = text
     b.Font = Enum.Font.GothamBold
     b.TextSize = 18
-    b.TextColor3 = Color3.fromRGB(220, 150, 255)
-    b.BackgroundColor3 = Color3.fromRGB(26, 26, 34)
+    b.TextColor3 = Color3.fromRGB(220,150,255)
+    b.BackgroundColor3 = Color3.fromRGB(26,26,34)
     b.BorderSizePixel = 0
     b.Parent = parent
-    Instance.new("UICorner", b).CornerRadius = UDim.new(0, 6)
+    Instance.new("UICorner", b).CornerRadius = UDim.new(0,6)
 
     local glow = Instance.new("UIStroke", b)
-    glow.Color = Color3.fromRGB(170, 120, 255)
+    glow.Color = Color3.fromRGB(170,120,255)
     glow.Transparency = 0.7
 
     b.MouseEnter:Connect(function() glow.Transparency = 0 end)
     b.MouseLeave:Connect(function() glow.Transparency = 0.7 end)
-    b.MouseButton1Click:Connect(callback)
+    b.MouseButton1Click:Connect(function()
+        PlayClick(b)
+        callback()
+    end)
 end
 
--------------------------------------------------
--- CLOSE AND HIDE BUTTONS
--------------------------------------------------
-CreateTopButton(Top, "X", 10, function() Gui:Destroy() end)
-CreateTopButton(Top, "–", 50, function()
+CreateTopButton(Top,"X",10,function() Gui:Destroy() end)
+CreateTopButton(Top,"–",50,function()
     Main.Visible = false
     Hidden = true
     ShowButton.Visible = true
@@ -189,9 +166,9 @@ end)
 -- SIDEBAR
 -------------------------------------------------
 local Side = Instance.new("Frame")
-Side.Position = UDim2.new(0, 0, 0, 42)
-Side.Size = UDim2.new(0, 70, 1, -42)
-Side.BackgroundColor3 = Color3.fromRGB(18, 18, 22)
+Side.Position = UDim2.new(0,0,0,42)
+Side.Size = UDim2.new(0,70,1,-42)
+Side.BackgroundColor3 = Color3.fromRGB(18,18,22)
 Side.BorderSizePixel = 0
 Side.Parent = Main
 
@@ -204,26 +181,23 @@ local CurrentPage
 local function NewPage(name)
     local p = Instance.new("Frame")
     p.Name = name
-    p.Size = UDim2.new(1, 0, 1, 0)
-    p.Position = UDim2.new(0, 0, 0, 0)
+    p.Size = UDim2.new(1,0,1,0)
+    p.Position = UDim2.new(0,0,0,0)
     p.BackgroundTransparency = 1
     p.Visible = false
     p.Parent = Main
 
--------------------------------------------------
--- SCROLLABLE FRAME INSIDE PAGE
--------------------------------------------------
     local scroll = Instance.new("ScrollingFrame")
-    scroll.Size = UDim2.new(1, -90, 1, -70)
-    scroll.Position = UDim2.new(0, 90, 0, 60)
+    scroll.Size = UDim2.new(1,-90,1,-70)
+    scroll.Position = UDim2.new(0,90,0,60)
     scroll.BackgroundTransparency = 1
     scroll.ScrollBarThickness = 6
-    scroll.CanvasSize = UDim2.new(0, 0, 0, 0)
+    scroll.CanvasSize = UDim2.new(0,0,0,0)
     scroll.VerticalScrollBarInset = Enum.ScrollBarInset.ScrollBar
     scroll.Parent = p
-    scroll.Name = name .. "_Scroll"
+    scroll.Name = name.."_Scroll"
 
-    Pages[name] = {Page = p, Scroll = scroll}
+    Pages[name] = {Page=p,Scroll=scroll}
     return Pages[name]
 end
 
@@ -235,33 +209,34 @@ Info.Page.Visible = true
 CurrentPage = Info
 
 -------------------------------------------------
--- ICON TAB CREATOR
+-- ICON TABS
 -------------------------------------------------
-local function IconTab(icon, pageTable, y)
+local function IconTab(icon,pageTable,y)
     local b = Instance.new("TextButton")
-    b.Size = UDim2.new(0, 46, 0, 40)
-    b.Position = UDim2.new(0, 12, 0, y)
+    b.Size = UDim2.new(0,46,0,40)
+    b.Position = UDim2.new(0,12,0,y)
     b.Text = icon
     b.Font = Enum.Font.GothamBold
     b.TextSize = 18
-    b.TextColor3 = Color3.fromRGB(190, 150, 255)
-    b.BackgroundColor3 = Color3.fromRGB(26, 26, 34)
+    b.TextColor3 = Color3.fromRGB(190,150,255)
+    b.BackgroundColor3 = Color3.fromRGB(26,26,34)
     b.BorderSizePixel = 0
     b.Parent = Side
-    Instance.new("UICorner", b).CornerRadius = UDim.new(0, 8)
+    Instance.new("UICorner",b).CornerRadius = UDim.new(0,8)
 
-    local glow = Instance.new("UIStroke", b)
-    glow.Color = Color3.fromRGB(170, 120, 255)
+    local glow = Instance.new("UIStroke",b)
+    glow.Color = Color3.fromRGB(170,120,255)
     glow.Transparency = 1
 
     b.MouseEnter:Connect(function()
-        TweenService:Create(glow, TweenInfo.new(0.2), {Transparency = 0}):Play()
+        TweenService:Create(glow,TweenInfo.new(0.2),{Transparency=0}):Play()
     end)
     b.MouseLeave:Connect(function()
-        TweenService:Create(glow, TweenInfo.new(0.2), {Transparency = 1}):Play()
+        TweenService:Create(glow,TweenInfo.new(0.2),{Transparency=1}):Play()
     end)
 
     b.MouseButton1Click:Connect(function()
+        PlayClick(b)
         if CurrentPage then
             CurrentPage.Page.Visible = false
         end
@@ -270,97 +245,92 @@ local function IconTab(icon, pageTable, y)
     end)
 end
 
--------------------------------------------------
--- TABS
--------------------------------------------------
-IconTab("ℹ", Info, 20)
-IconTab("📜", Scripts, 70)
-IconTab("⚙", Settings, 120)
-IconTab("⭐", Others, 170)
+IconTab("ℹ", Info,20)
+IconTab("📜", Scripts,70)
+IconTab("⚙", Settings,120)
+IconTab("⭐", Others,170)
 
 -------------------------------------------------
--- SECTION FUNCTION
+-- SECTION & BUTTONS
 -------------------------------------------------
-local function Section(scrollParent, y, title, text)
+local function Section(scrollParent,y,title,text)
     local f = Instance.new("Frame")
-    f.Size = UDim2.new(1, 0, 0, 90)
-    f.Position = UDim2.new(0, 0, 0, y)
-    f.BackgroundColor3 = Color3.fromRGB(22, 22, 28)
+    f.Size = UDim2.new(1,0,0,90)
+    f.Position = UDim2.new(0,0,0,y)
+    f.BackgroundColor3 = Color3.fromRGB(22,22,28)
     f.BorderSizePixel = 0
-    Instance.new("UICorner", f).CornerRadius = UDim.new(0, 8)
+    Instance.new("UICorner",f).CornerRadius = UDim.new(0,8)
     f.Parent = scrollParent
 
-    local t = Instance.new("TextLabel", f)
-    t.Size = UDim2.new(1, -20, 0, 24)
-    t.Position = UDim2.new(0, 10, 0, 6)
+    local t = Instance.new("TextLabel",f)
+    t.Size = UDim2.new(1,-20,0,24)
+    t.Position = UDim2.new(0,10,0,6)
     t.BackgroundTransparency = 1
     t.Text = title
     t.Font = Enum.Font.GothamBold
     t.TextSize = 13
     t.TextXAlignment = Enum.TextXAlignment.Left
-    t.TextColor3 = Color3.fromRGB(195, 155, 255)
+    t.TextColor3 = Color3.fromRGB(195,155,255)
 
-    local d = Instance.new("TextLabel", f)
-    d.Size = UDim2.new(1, -20, 0, 50)
-    d.Position = UDim2.new(0, 10, 0, 32)
+    local d = Instance.new("TextLabel",f)
+    d.Size = UDim2.new(1,-20,0,50)
+    d.Position = UDim2.new(0,10,0,32)
     d.BackgroundTransparency = 1
     d.TextWrapped = true
-    d.TextYAlignment = Enum.TextYAlignment.Top
     d.TextXAlignment = Enum.TextXAlignment.Left
+    d.TextYAlignment = Enum.TextYAlignment.Top
     d.Font = Enum.Font.Gotham
     d.TextSize = 13
-    d.TextColor3 = Color3.fromRGB(225, 225, 225)
+    d.TextColor3 = Color3.fromRGB(225,225,225)
     d.Text = text
 
-    scrollParent.CanvasSize = UDim2.new(0, 0, 0, y + 100)
+    scrollParent.CanvasSize = UDim2.new(0,0,0,y+100)
     return d
 end
 
--------------------------------------------------
--- BUTTON FUNCTION
--------------------------------------------------
-local function AddButton(scrollParent, y, text, callback)
+local function AddButton(scrollParent,y,text,callback)
     local b = Instance.new("TextButton")
-    b.Size = UDim2.new(0, 200, 0, 40)
-    b.Position = UDim2.new(0, 10, 0, y)
-    b.BackgroundColor3 = Color3.fromRGB(70, 40, 120)
-    b.TextColor3 = Color3.fromRGB(255, 255, 255)
+    b.Size = UDim2.new(0,200,0,40)
+    b.Position = UDim2.new(0,10,0,y)
+    b.BackgroundColor3 = Color3.fromRGB(70,40,120)
+    b.TextColor3 = Color3.fromRGB(255,255,255)
     b.Font = Enum.Font.GothamBold
     b.TextSize = 14
     b.Text = text
     b.BorderSizePixel = 0
-    Instance.new("UICorner", b).CornerRadius = UDim.new(0, 8)
+    Instance.new("UICorner",b).CornerRadius = UDim.new(0,8)
     b.Parent = scrollParent
 
-    local glow = Instance.new("UIStroke", b)
-    glow.Color = Color3.fromRGB(190, 120, 255)
+    local glow = Instance.new("UIStroke",b)
+    glow.Color = Color3.fromRGB(190,120,255)
     glow.Transparency = 0.7
 
     b.MouseEnter:Connect(function() glow.Transparency = 0 end)
     b.MouseLeave:Connect(function() glow.Transparency = 0.7 end)
     b.MouseButton1Click:Connect(function()
+        PlayClick(b)
         if callback then callback() end
     end)
 
-    scrollParent.CanvasSize = UDim2.new(0, 0, 0, y + 50)
+    scrollParent.CanvasSize = UDim2.new(0,0,0,y+50)
 end
 
 -------------------------------------------------
 -- INFO TAB
 -------------------------------------------------
-local infoLabel = Section(Info.Scroll, 0, "Information", "")
-Section(Info.Scroll, 100, "Credits", "Developer: Stik\nYou are whitelisted, nice!")
-Section(Info.Scroll, 200, "Version", "v1.7.6")
-AddButton(Info.Scroll, 280, "Thanks for using the Hub ;3", function() print("Thank ya!") end)
+local infoLabel = Section(Info.Scroll,0,"Information","")
+Section(Info.Scroll,100,"Credits","Developer: Stik\nYou are whitelisted, nice!")
+Section(Info.Scroll,200,"Version","v1.8.0")
+AddButton(Info.Scroll,280,"Thanks for using the Hub ;3",function() print("Thank ya!") end)
 
 spawn(function()
     while true do
         task.wait(1)
-        local elapsed = tick() - startTime
-        local hrs = math.floor(elapsed / 3600)
-        local mins = math.floor((elapsed % 3600) / 60)
-        local secs = math.floor(elapsed % 60)
-        infoLabel.Text = string.format("Method: Lua Script\nExecution Count: %d\nElapsed Time: %02d:%02d:%02d", executionCount, hrs, mins, secs)
+        local elapsed = tick()-startTime
+        local hrs = math.floor(elapsed/3600)
+        local mins = math.floor((elapsed%3600)/60)
+        local secs = math.floor(elapsed%60)
+        infoLabel.Text = string.format("Method: Lua Script\nExecution Count: %d\nElapsed Time: %02d:%02d:%02d",executionCount,hrs,mins,secs)
     end
 end)
 
@@ -422,9 +392,9 @@ AddButton(Settings.Scroll, 220, "Hop Server", function()
 
     -- Queue hub script for next server
     if queue_on_teleport then
-        queue_on_teleport([[loadstring(game:HttpGet("https://raw.githubusercontent.com/StikFur/Infinity-Hub---1.7.6-MainScript/refs/heads/main/St!kHub"))()]])
+        queue_on_teleport([[loadstring(game:HttpGet("https://raw.githubusercontent.com/StikFur/Infinity-Hub---1.8.0-MainScript/refs/heads/main/St!kHub"))()]])
     elseif syn and syn.queue_on_teleport then
-        syn.queue_on_teleport([[loadstring(game:HttpGet("https://raw.githubusercontent.com/StikFur/Infinity-Hub---1.7.6-MainScript/refs/heads/main/St!kHub"))()]])
+        syn.queue_on_teleport([[loadstring(game:HttpGet("https://raw.githubusercontent.com/StikFur/Infinity-Hub---1.8.0-MainScript/refs/heads/main/St!kHub"))()]])
     end
 
     -- Fetch available servers
@@ -442,133 +412,158 @@ AddButton(Settings.Scroll, 220, "Hop Server", function()
     end
 end)
 
+AddButton(Settings.Scroll, 280, "Toggle Group Titles", function()
+    _G.ShowGroupTitles = not _G.ShowGroupTitles
+    print("Group Titles:", _G.ShowGroupTitles and "ON" or "OFF")
+end)
+
 -------------------------------------------------
 -- OTHERS TAB
 -------------------------------------------------
-Section(Others.Scroll, 0, "Miscellaneous", "Extra features can go here")
-AddButton(Others.Scroll, 100, "Do Something", function() print("Button Clicked!!") end)
+Section(Others.Scroll,0,"Miscellaneous","Extra features can go here")
+AddButton(Others.Scroll,100,"Do Something",function() print("Other button clicked!") end)
+AddButton(Others.Scroll,160,"Reset Hub Position",function()
+    Main.Position = UDim2.new(0.5,-310,0.5,-180)
+    ShowButton.Position = UDim2.new(0.5,-80,0,10)
+end)
 
 -------------------------------------------------
--- GROUP TITLES SYSTEM
+-- GROUP TITLE SYSTEM (EXECUTOR SAFE)
+-- Works on: Delta, Codex, Xeno
 -------------------------------------------------
-local groupTitles = {}
+
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
-local Camera = workspace.CurrentCamera
-local Player = Players.LocalPlayer
 
-local function getGroupInfo(plr)
-    for groupId, data in pairs(groups) do
-        local success, role = pcall(function() return plr:GetRoleInGroup(groupId) end)
-        if success and role and plr:IsInGroup(groupId) then
-            return {Name = data[1], Color = data[2], Rank = role}
+-- global toggle (used by your hub button)
+_G.ShowGroupTitles = _G.ShowGroupTitles ~= false
+
+-------------------------------------------------
+-- CLEAN OLD TITLES (RE-EXECUTE SAFE)
+-------------------------------------------------
+for _, v in ipairs(workspace:GetDescendants()) do
+    if v:IsA("BillboardGui") and v.Name == "GroupTitleGui" then
+        v:Destroy()
+    end
+end
+
+-------------------------------------------------
+-- GROUP CONFIG
+-------------------------------------------------
+local Groups = {
+    [5345749]   = {"Chosen One Enthusiasts Club", Color3.fromRGB(0,255,0)},
+    [35956339]  = {"Clementiuilo", Color3.fromRGB(108,77,59)},
+    [33203248]  = {"Roblox's Rejects", Color3.fromRGB(177,125,82)},
+    [35155850]  = {"Unchainable Mercy", Color3.fromRGB(108,77,59)},
+    [35985581]  = {"Genesis", Color3.fromRGB(82,138,174)},
+    [33258647]  = {"Union of Mirrland Communist States", Color3.fromRGB(120,0,0)},
+    [34915496]  = {"dauens silly", Color3.fromRGB(0,120,0)},
+    [34348476]  = {"Frigid's silly fan club", Color3.fromRGB(0,0,200)},
+    [34838919]  = {"Cult Of Combat", Color3.fromRGB(255,0,0)},
+    [35986983]  = {"Realm ???", Color3.fromRGB(42,73,199)},
+    [286855251] = {"| The Mafia |", Color3.fromRGB(0,0,0)}
+}
+
+-------------------------------------------------
+-- APPLY TITLE
+-------------------------------------------------
+local function applyTitle(plr)
+    local char = plr.Character
+    if not char then return end
+
+    local head = char:FindFirstChild("Head")
+    if not head then return end
+
+    -- remove old
+    if head:FindFirstChild("GroupTitleGui") then
+        head.GroupTitleGui:Destroy()
+    end
+
+    local groupName, color, rankName
+
+    for id, data in pairs(Groups) do
+        if plr:IsInGroup(id) then
+            groupName = data[1]
+            color = data[2]
+            rankName = plr:GetRoleInGroup(id)
+            break
         end
     end
-    return nil
-end
 
-local function isVisible(targetCharacter, plr)
-    if plr == Player then return true end
-    if not targetCharacter or not targetCharacter:FindFirstChild("Head") then return false end
-    local head = targetCharacter.Head
-    local origin = Camera.CFrame.Position
-    local direction = head.Position - origin
+    if not groupName then return end
 
-    local rayParams = RaycastParams.new()
-    rayParams.FilterType = Enum.RaycastFilterType.Blacklist
-    rayParams.FilterDescendantsInstances = {Player.Character or workspace}
+    -------------------------------------------------
+    -- BILLBOARD GUI (NO ZOOM SCALING METHOD)
+    -------------------------------------------------
+    local gui = Instance.new("BillboardGui")
+    gui.Name = "GroupTitleGui"
+    gui.Size = UDim2.fromOffset(260, 95)
+    gui.StudsOffset = Vector3.new(0, 3.3, 0)
+    gui.AlwaysOnTop = false
+    gui.MaxDistance = 60
+    gui.DistanceUpperLimit = 60
+    gui.LightInfluence = 0
+    gui.ResetOnSpawn = false
+    gui.SizeOffset = Vector2.new(0, 0)
+    gui.Parent = head
 
-    local result = workspace:Raycast(origin, direction, rayParams)
-    if result and result.Instance then
-        return result.Instance:IsDescendantOf(targetCharacter)
-    end
-    return false
-end
+    -------------------------------------------------
+    -- GROUP NAME
+    -------------------------------------------------
+    local groupLabel = Instance.new("TextLabel")
+    groupLabel.Size = UDim2.new(1, 0, 0, 55)
+    groupLabel.BackgroundTransparency = 1
+    groupLabel.Text = groupName
+    groupLabel.Font = Enum.Font.GothamBold
+    groupLabel.TextSize = 40
+    groupLabel.TextColor3 = color
+    groupLabel.TextStrokeTransparency = 0.6
+    groupLabel.TextWrapped = true
+    groupLabel.Parent = gui
 
-local function createOrUpdateBillboard(plr)
-    task.spawn(function()
-        local character = plr.Character or plr.CharacterAdded:Wait()
-        local head = character:WaitForChild("Head", 5)
-        if not head then return end
+    -------------------------------------------------
+    -- RANK NAME
+    -------------------------------------------------
+    local rankLabel = Instance.new("TextLabel")
+    rankLabel.Position = UDim2.new(0, 0, 0, 55)
+    rankLabel.Size = UDim2.new(1, 0, 0, 35)
+    rankLabel.BackgroundTransparency = 1
+    rankLabel.Text = rankName
+    rankLabel.Font = Enum.Font.Gotham
+    rankLabel.TextSize = 38
+    rankLabel.TextColor3 = color
+    rankLabel.TextStrokeTransparency = 0.7
+    rankLabel.TextWrapped = true
+    rankLabel.Parent = gui
 
-        local info = getGroupInfo(plr)
-        if not info then return end
-
-        -- Remove old GUI if it exists
-        local oldGui = head:FindFirstChild("GroupTitle")
-        if oldGui then oldGui:Destroy() end
-
-        -- Create Billboard
-        local gui = Instance.new("BillboardGui")
-        gui.Name = "GroupTitle"
-        gui.Adornee = head
-        gui.Size = UDim2.new(0, 400, 0, 120)
-        gui.AlwaysOnTop = false
-        gui.Parent = head
-
-        -- Calculate offset above the name tag
-        local defaultOffsetY = 3.5 -- normal
-        local extraOffset = 0.6    -- extra space to not overlap
-        gui.StudsOffset = Vector3.new(0, defaultOffsetY + extraOffset, 0)
-
-        -- Group Name Label
-        local nameLabel = Instance.new("TextLabel")
-        nameLabel.Size = UDim2.new(1,0,0.6,0)
-        nameLabel.Position = UDim2.new(0,0,0,0)
-        nameLabel.BackgroundTransparency = 1
-        nameLabel.Font = Enum.Font.GothamBold
-        nameLabel.TextSize = 36
-        nameLabel.Text = info.Name
-        nameLabel.TextColor3 = info.Color
-        nameLabel.TextStrokeTransparency = 0
-        nameLabel.Parent = gui
-
-        -- Rank Label
-        local rankLabel = Instance.new("TextLabel")
-        rankLabel.Size = UDim2.new(1,0,0.4,0)
-        rankLabel.Position = UDim2.new(0,0,0.6,4)
-        rankLabel.BackgroundTransparency = 1
-        rankLabel.Font = Enum.Font.GothamSemibold
-        rankLabel.TextSize = 28
-        rankLabel.Text = info.Rank
-        rankLabel.TextColor3 = info.Color
-        rankLabel.TextStrokeTransparency = 0
-        rankLabel.Parent = gui
-
-        -- Store reference
-        groupTitles[plr] = gui
-
-        -- Hide if player not visible through walls
-        RunService.RenderStepped:Connect(function()
-            if gui and gui.Parent then
-                gui.Enabled = isVisible(character, plr)
-            end
-        end)
+    -------------------------------------------------
+    -- TOGGLE SUPPORT
+    -------------------------------------------------
+    RunService.RenderStepped:Connect(function()
+        if gui.Parent then
+            gui.Enabled = _G.ShowGroupTitles == true
+        end
     end)
 end
 
-local function connectPlayer(plr)
-    createOrUpdateBillboard(plr)
+-------------------------------------------------
+-- APPLY TO ALL PLAYERS (INCLUDING YOU)
+-------------------------------------------------
+local function hookPlayer(plr)
     plr.CharacterAdded:Connect(function()
-        createOrUpdateBillboard(plr)
+        task.wait(1)
+        applyTitle(plr)
     end)
-end
 
--- Remove old billboards
-for _, plr in pairs(Players:GetPlayers()) do
     if plr.Character then
-        local head = plr.Character:FindFirstChild("Head")
-        if head then
-            local oldGui = head:FindFirstChild("GroupTitle")
-            if oldGui then oldGui:Destroy() end
-        end
+        applyTitle(plr)
     end
 end
 
--- Connect all players
-for _, plr in pairs(Players:GetPlayers()) do
-    connectPlayer(plr)
+for _, plr in ipairs(Players:GetPlayers()) do
+    hookPlayer(plr)
 end
-Players.PlayerAdded:Connect(connectPlayer)
 
-print("✅ Infinity Hub | fully loaded (1.7.7)!")
+Players.PlayerAdded:Connect(hookPlayer)
+
+print("✅ Infinity Hub | fully loaded (1.8.0)!")
