@@ -339,10 +339,10 @@ local startY = 100
 local buttonHeight = 40
 
 local scriptsList = {
-    {"- Translator -", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/StikFur/translator/refs/heads/main/Translator"))() executionCount = executionCount + 1 print("- Translator executed!") end},
+    {"- Translator -", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/Shiawase353/translator/refs/heads/main/Translator"))() executionCount = executionCount + 1 print("- Translator executed!") end},
     {"- Ported IY -", function() loadstring(game:HttpGet("https://pandadevelopment.net/virtual/file/2eabce36586bcc7d"))() executionCount = executionCount + 1 print("- Ported IY executed!") end},
     {"- VPLI Hub -", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/Adam3mka/The-chosen-one-lukaku/refs/heads/main/Protected_6361979247750901.txt"))() executionCount = executionCount + 1 print("- VPLI Hub executed!") end},
-    {"- Matrix Hub -", function() loadstring(game:HttpGet('https://raw.githubusercontent.com/StikFur/MatrixHUB/refs/heads/main/Stik'))() executionCount = executionCount + 1 print("- Matrix Hub executed!") end},
+    {"- Matrix Hub -", function() loadstring(game:HttpGet('https://raw.githubusercontent.com/Shiawase353/MatrixHUB/refs/heads/main/Stik'))() executionCount = executionCount + 1 print("- Matrix Hub executed!") end},
     {"- Extra Stuff -", function() loadstring(game:HttpGet("https://pastebin.com/raw/sqadnExa"))() executionCount = executionCount + 1 print("- Extra Stuff executed!") end},
     {"- XVC Hub -", function() loadstring(game:HttpGet("https://luna.xvchubontop.workers.dev/"))() executionCount = executionCount + 1 print("- XVC Hub executed!") end},
     {"- Brick UA -", function() loadstring(game:HttpGet("https://pastebin.com/raw/ZwCXk9mb"))() executionCount = executionCount + 1 print("- Brick UA executed!") end},
@@ -369,9 +369,9 @@ AddButton(Settings.Scroll, 160, "Rejoin Server", function()
 
     -- Queue your hub script before teleport
     if queue_on_teleport then
-        queue_on_teleport([[loadstring(game:HttpGet("https://raw.githubusercontent.com/StikFur/Infinity-Hub---1.7.6-MainScript/refs/heads/main/St!kHub"))()]])
+        queue_on_teleport([[loadstring(game:HttpGet("https://raw.githubusercontent.com/Shiawase353/Infinity-Hub---1.8.0-MainScript/refs/heads/main/St!kHub"))()]])
     elseif syn and syn.queue_on_teleport then
-        syn.queue_on_teleport([[loadstring(game:HttpGet("https://raw.githubusercontent.com/StikFur/Infinity-Hub---1.7.6-MainScript/refs/heads/main/St!kHub"))()]])
+        syn.queue_on_teleport([[loadstring(game:HttpGet("https://raw.githubusercontent.com/Shiawase353/Infinity-Hub---1.8.9-MainScript/refs/heads/main/St!kHub"))()]])
     end
 
     -- Teleport
@@ -387,9 +387,9 @@ AddButton(Settings.Scroll, 220, "Hop Server", function()
 
     -- Queue hub script for next server
     if queue_on_teleport then
-        queue_on_teleport([[loadstring(game:HttpGet("https://raw.githubusercontent.com/StikFur/Infinity-Hub---1.8.0-MainScript/refs/heads/main/St!kHub"))()]])
+        queue_on_teleport([[loadstring(game:HttpGet("https://raw.githubusercontent.com/Shiawase353/Infinity-Hub---1.8.0-MainScript/refs/heads/main/St!kHub"))()]])
     elseif syn and syn.queue_on_teleport then
-        syn.queue_on_teleport([[loadstring(game:HttpGet("https://raw.githubusercontent.com/StikFur/Infinity-Hub---1.8.0-MainScript/refs/heads/main/St!kHub"))()]])
+        syn.queue_on_teleport([[loadstring(game:HttpGet("https://raw.githubusercontent.com/Shiawase353/Infinity-Hub---1.8.0-MainScript/refs/heads/main/St!kHub"))()]])
     end
 
     -- Fetch available servers
